@@ -8,9 +8,9 @@ using System.Linq;
 // end-to-end demo: file a GitHub Issue → let Copilot fix it → open a Pull
 // Request → review → merge.
 //
-// The bug:
-//   ApplyDiscount() treats a PERCENTAGE discount as a flat amount. A "10%"
-//   coupon subtracts 10 currency units instead of 10% of the subtotal.
+// The bug (now fixed):
+//   ApplyDiscount() treated a PERCENTAGE discount as a flat amount. A "10%"
+//   coupon subtracted 10 currency units instead of 10% of the subtotal.
 //   See ISSUE.md in this folder for the bug report to copy into GitHub.
 //
 // Demo flow (see the language README for the full script):
@@ -61,9 +61,11 @@ public class ShoppingCart
         if (_coupon is null)
             return subtotal;
 
-        // BUG: a percentage coupon subtracts the raw Value (e.g. 10) instead of
-        // computing Value percent OF the subtotal (subtotal * Value / 100).
-        decimal discounted = subtotal - _coupon.Value;
+        decimal discountAmount = _coupon.IsPercentage
+            ? subtotal * _coupon.Value / 100m
+            : _coupon.Value;
+
+        decimal discounted = subtotal - discountAmount;
 
         return discounted < 0 ? 0 : discounted;
     }
@@ -89,6 +91,6 @@ public static class Program
         Console.WriteLine($"Total:    {total:C}");
         Console.WriteLine();
         Console.WriteLine($"Expected total with 10% off: {subtotal * 0.90m:C}");
-        Console.WriteLine($"Actual total (buggy):        {total:C}");
+        Console.WriteLine($"Actual total:                {total:C}");
     }
 }
