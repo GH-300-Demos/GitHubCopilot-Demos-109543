@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GitHubAgentTask.csproj" />
+  <Project Path="GitHubAgentTask.Tests/GitHubAgentTask.Tests.csproj" />
+</Solution>
