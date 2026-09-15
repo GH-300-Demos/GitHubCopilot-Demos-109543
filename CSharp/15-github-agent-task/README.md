@@ -7,9 +7,9 @@
 - `CountWords(string text)` counts whitespace-separated words.
 - `CountCharacters(string text, bool includeWhitespace = true)` counts characters, optionally excluding whitespace.
 - `CountSentences(string text)` counts non-empty sentence fragments split on `.`, `!`, and `?`.
-- `AverageWordLength(string text)` returns the average number of letters per word rounded to two decimals, or `0` for empty text.
-- `EstimateReadingTimeMinutes(string text)` estimates reading time at about 200 words per minute, rounded up with a minimum of one minute for non-empty text.
-- `TopWords(string text, int n)` returns the `n` most frequent words case-insensitively, breaking ties alphabetically.
+- `AverageWordLength(string text)` returns the average length of letter-sequence words rounded to two decimals, or `0` for empty text.
+- `EstimateReadingTimeMinutes(string text)` estimates reading time at about 200 letter-sequence words per minute, rounded up with a minimum of one minute for non-empty text.
+- `TopWords(string text, int n)` returns the `n` most frequent letter-sequence words case-insensitively, breaking ties alphabetically.
 
 ## Usage
 

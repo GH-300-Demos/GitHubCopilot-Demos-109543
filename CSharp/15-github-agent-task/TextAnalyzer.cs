@@ -67,7 +67,7 @@ public class TextAnalyzer
             .Count(fragment => !string.IsNullOrWhiteSpace(fragment));
     }
 
-    /// <summary>Calculates the average number of letters per word in <paramref name="text"/>.</summary>
+    /// <summary>Calculates the average length of letter-sequence words in <paramref name="text"/>.</summary>
     public double AverageWordLength(string text)
     {
         var words = ExtractWords(text).ToList();
@@ -79,7 +79,7 @@ public class TextAnalyzer
         return Math.Round(words.Average(word => word.Length), 2);
     }
 
-    /// <summary>Estimates reading time in whole minutes at about 200 words per minute.</summary>
+    /// <summary>Estimates reading time in whole minutes at about 200 letter-sequence words per minute.</summary>
     public int EstimateReadingTimeMinutes(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -91,7 +91,7 @@ public class TextAnalyzer
         return Math.Max(1, (int)Math.Ceiling(wordCount / WordsPerMinute));
     }
 
-    /// <summary>Returns the most frequent words in <paramref name="text"/>, case-insensitively.</summary>
+    /// <summary>Returns the most frequent letter-sequence words in <paramref name="text"/>, case-insensitively.</summary>
     public IReadOnlyList<(string Word, int Count)> TopWords(string text, int n)
     {
         if (n <= 0)
