@@ -28,6 +28,8 @@ using System.Text.RegularExpressions;
 /// </summary>
 public class TextAnalyzer
 {
+    private const double WordsPerMinute = 200.0;
+
     /// <summary>Counts the words in <paramref name="text"/> (whitespace-separated).</summary>
     public int CountWords(string text)
     {
@@ -86,7 +88,7 @@ public class TextAnalyzer
         }
 
         var wordCount = ExtractWords(text).Count();
-        return Math.Max(1, (int)Math.Ceiling(wordCount / 200.0));
+        return Math.Max(1, (int)Math.Ceiling(wordCount / WordsPerMinute));
     }
 
     /// <summary>Returns the most frequent words in <paramref name="text"/>, case-insensitively.</summary>
