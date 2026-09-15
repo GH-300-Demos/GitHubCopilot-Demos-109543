@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Demo 15 — Run an Agent Task on GitHub.com
@@ -51,13 +52,70 @@ public class TextAnalyzer
             : text.Count(c => !char.IsWhiteSpace(c));
     }
 
-    // TODO (agent task — see TASK.md): the Copilot coding agent on GitHub.com
-    // should implement the following, with xUnit tests and a short README:
-    //   - int CountSentences(string text)          → split on '.', '!', '?'
-    //   - double AverageWordLength(string text)    → letters per word, 2 decimals
-    //   - int EstimateReadingTimeMinutes(string text) → rounded up, ~200 wpm
-    //   - IReadOnlyList<(string Word, int Count)> TopWords(string text, int n)
-    //       → the n most frequent words, case-insensitive, ties broken alphabetically
+    /// <summary>Counts sentences in <paramref name="text"/> by splitting on '.', '!', and '?'.</summary>
+    public int CountSentences(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return 0;
+        }
+
+        return text
+            .Split(new[] { '.', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
+            .Count(fragment => !string.IsNullOrWhiteSpace(fragment));
+    }
+
+    /// <summary>Calculates the average number of letters per word in <paramref name="text"/>.</summary>
+    public double AverageWordLength(string text)
+    {
+        var words = ExtractWords(text).ToList();
+        if (words.Count == 0)
+        {
+            return 0;
+        }
+
+        return Math.Round(words.Average(word => word.Length), 2);
+    }
+
+    /// <summary>Estimates reading time in whole minutes at about 200 words per minute.</summary>
+    public int EstimateReadingTimeMinutes(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return 0;
+        }
+
+        var wordCount = ExtractWords(text).Count();
+        return Math.Max(1, (int)Math.Ceiling(wordCount / 200.0));
+    }
+
+    /// <summary>Returns the most frequent words in <paramref name="text"/>, case-insensitively.</summary>
+    public IReadOnlyList<(string Word, int Count)> TopWords(string text, int n)
+    {
+        if (n <= 0)
+        {
+            return Array.Empty<(string Word, int Count)>();
+        }
+
+        return ExtractWords(text)
+            .Select(word => word.ToLowerInvariant())
+            .GroupBy(word => word)
+            .Select(group => (Word: group.Key, Count: group.Count()))
+            .OrderByDescending(entry => entry.Count)
+            .ThenBy(entry => entry.Word)
+            .Take(n)
+            .ToList();
+    }
+
+    private static IEnumerable<string> ExtractWords(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        return Regex.Matches(text, @"\p{L}+").Select(match => match.Value);
+    }
 }
 
 public static class Program
@@ -74,8 +132,13 @@ public static class Program
         Console.WriteLine($"Words:               {analyzer.CountWords(sample)}");
         Console.WriteLine($"Characters:          {analyzer.CountCharacters(sample)}");
         Console.WriteLine($"Characters (no ws):  {analyzer.CountCharacters(sample, includeWhitespace: false)}");
-        Console.WriteLine();
-        Console.WriteLine("Sentences, average word length, reading time and top words");
-        Console.WriteLine("are NOT implemented yet — that's the agent's task (see TASK.md).");
+        Console.WriteLine($"Sentences:           {analyzer.CountSentences(sample)}");
+        Console.WriteLine($"Avg word length:     {analyzer.AverageWordLength(sample)}");
+        Console.WriteLine($"Reading time:        {analyzer.EstimateReadingTimeMinutes(sample)} minute(s)");
+        Console.WriteLine("Top words:");
+        foreach (var (word, count) in analyzer.TopWords(sample, 5))
+        {
+            Console.WriteLine($"  {word}: {count}");
+        }
     }
 }
